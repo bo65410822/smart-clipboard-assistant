@@ -11,6 +11,8 @@ sealed class ClipboardAction {
     data object ExplainCode : ClipboardAction()
     data object AnalyzeCode : ClipboardAction()
     data object OpenUrl : ClipboardAction()
+    /** 对剪贴板中的 URL 做摘要（走 AI）。 */
+    data object SummarizeUrl : ClipboardAction()
     data object SummarizeText : ClipboardAction()
     data object TranslateText : ClipboardAction()
 }

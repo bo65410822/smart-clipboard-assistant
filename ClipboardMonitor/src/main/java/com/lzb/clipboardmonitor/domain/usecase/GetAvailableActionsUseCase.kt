@@ -21,7 +21,7 @@ class GetAvailableActionsUseCase @Inject constructor() {
             )
             ContentType.URL -> listOf(
                 ClipboardAction.OpenUrl,
-                ClipboardAction.SummarizeText
+                ClipboardAction.SummarizeUrl
             )
             ContentType.TEXT -> listOf(
                 ClipboardAction.TranslateText,

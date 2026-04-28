@@ -21,7 +21,9 @@ import org.json.JSONObject
 class ClassifyClipboardContentUseCase @Inject constructor() {
 
     operator fun invoke(content: ClipboardContent): ClassifiedClipboardContent {
-        val trimmed = content.text.trim()
+        val trimmed = content.text
+            .trim()
+            .trimStart(BOM_CHAR)
 
         val type = when {
             trimmed.isEmpty() -> ContentType.UNKNOWN
@@ -85,6 +87,7 @@ class ClassifyClipboardContentUseCase @Inject constructor() {
     }
 
     private companion object {
+        private const val BOM_CHAR: Char = '\uFEFF'
         private const val MAX_CLASSIFY_TEXT_LENGTH = 50_000
         private const val MAX_JSON_PARSE_LENGTH = 10_000
 

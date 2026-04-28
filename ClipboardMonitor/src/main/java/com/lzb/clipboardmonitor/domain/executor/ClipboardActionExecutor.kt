@@ -8,7 +8,7 @@ import com.lzb.clipboardmonitor.domain.model.ClipboardAction
  */
 interface ClipboardActionExecutor {
     suspend fun execute(
-        action: ClipboardAction,
+        action: ClipboardAction?,
         content: String
     ): ActionResult
 }

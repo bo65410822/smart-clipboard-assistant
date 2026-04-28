@@ -1,0 +1,78 @@
+{
+    "company": {
+      "name": "Acme Corp",
+      "location": {
+        "city": "Shanghai",
+        "country": "China",
+        "address": {
+          "street": "123 Nanjing Road",
+          "zip": "200001"
+        }
+      },
+      "departments": [
+        {
+          "name": "Engineering",
+          "teams": [
+            {
+              "name": "Backend",
+              "lead": {
+                "name": "Alice Zhang",
+                "email": "alice@acme.com",
+                "phone": "+8613800000001"
+              },
+              "members": 8
+            },
+            {
+              "name": "Frontend",
+              "lead": {
+                "name": "Bob Li",
+                "email": "bob@acme.com",
+                "phone": "+8613800000002"
+              },
+              "members": 5
+            }
+          ]
+        },
+        {
+          "name": "HR",
+          "lead": {
+            "name": "Carol Wang",
+            "email": "carol@acme.com",
+            "phone": "+8613800000003"
+          },
+          "members": 3
+        }
+      ]
+    },
+    "projects": [
+      {
+        "id": "P1001",
+        "name": "NextGen Platform",
+        "status": "active",
+        "budget": 1200000.5,
+        "tags": ["AI", "Cloud", "Kotlin"],
+        "milestones": [
+          {
+            "name": "Design",
+            "completed": true,
+            "dueDate": "2026-05-15"
+          },
+          {
+            "name": "Implementation",
+            "completed": false,
+            "dueDate": "2026-08-30"
+          }
+        ]
+      },
+      {
+        "id": "P1002",
+        "name": "Mobile Revamp",
+        "status": "planned",
+        "budget": 500000,
+        "tags": ["Android", "Compose", "UI/UX"]
+      }
+    ],
+    "active": true,
+    "founded": 2015,
+    "website": "https://www.acme.com"
+  }
