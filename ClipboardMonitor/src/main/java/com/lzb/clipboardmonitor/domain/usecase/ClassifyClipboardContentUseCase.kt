@@ -12,7 +12,7 @@ import org.json.JSONObject
  * 基于本地规则的剪贴板内容分类用例。
  *
  * 规则顺序：
- * 1) JSON -> 2) URL -> 3) CODE -> 4) TEXT
+ * 1) JSON -> 2) CODE -> 3) URL -> 4) TEXT
  *
  * 说明：
  * - UNKNOWN 仅用于“不可判定或不值得判定”的场景（如空文本、超长文本）。
@@ -29,8 +29,8 @@ class ClassifyClipboardContentUseCase @Inject constructor() {
             trimmed.isEmpty() -> ContentType.UNKNOWN
             trimmed.length > MAX_CLASSIFY_TEXT_LENGTH -> ContentType.UNKNOWN
             isJson(trimmed) -> ContentType.JSON
-            isUrl(trimmed) -> ContentType.URL
             isCode(trimmed) -> ContentType.CODE
+            isUrl(trimmed) -> ContentType.URL
             else -> ContentType.TEXT
         }
 

@@ -1,9 +1,12 @@
 package com.lzb.clipboardmonitor.data.executor
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import com.lzb.clipboardmonitor.domain.executor.ClipboardActionExecutor
 import com.lzb.clipboardmonitor.domain.model.ActionResult
 import com.lzb.clipboardmonitor.domain.model.ClipboardAction
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import org.json.JSONArray
@@ -13,7 +16,9 @@ import org.json.JSONObject
  * 纯本地动作执行器（无网络依赖）。
  */
 @Singleton
-class LocalClipboardActionExecutor @Inject constructor() : ClipboardActionExecutor {
+class LocalClipboardActionExecutor @Inject constructor(
+    @ApplicationContext private val context: Context
+) : ClipboardActionExecutor {
 
     override suspend fun execute(
         action: ClipboardAction?,
@@ -23,7 +28,7 @@ class LocalClipboardActionExecutor @Inject constructor() : ClipboardActionExecut
             when (action) {
                 ClipboardAction.FormatJson -> formatJson(content)
                 ClipboardAction.ConvertToKotlinDataClass -> convertToDataClass(content)
-                ClipboardAction.OpenUrl -> parseUrl(content)
+                ClipboardAction.OpenUrl -> openUrl(content)
                 ClipboardAction.SummarizeText -> summarize(content)
                 ClipboardAction.TranslateText -> translate(content)
                 ClipboardAction.ExplainCode -> explainCode(content)
@@ -83,16 +88,59 @@ class LocalClipboardActionExecutor @Inject constructor() : ClipboardActionExecut
 
     private fun parseUrl(input: String): ActionResult {
         return try {
-            val uri = Uri.parse(input.trim())
-            val names = uri.queryParameterNames
-            if (names.isEmpty()) return ActionResult.Success("No query params")
-
-            val result = names.joinToString("\n") { name ->
-                "$name = ${uri.getQueryParameter(name).orEmpty()}"
+            val raw = input.trim()
+            val normalized = if (
+                raw.startsWith("http://", ignoreCase = true) ||
+                raw.startsWith("https://", ignoreCase = true)
+            ) {
+                raw
+            } else {
+                "https://$raw"
             }
-            ActionResult.Success(result)
+            val uri = Uri.parse(normalized)
+            val scheme = uri.scheme.orEmpty().ifBlank { "unknown" }
+            val host = uri.host.orEmpty().ifBlank { "unknown" }
+            val path = uri.path.orEmpty().ifBlank { "/" }
+            val names = uri.queryParameterNames.sorted()
+            val queryText = if (names.isEmpty()) {
+                "无"
+            } else {
+                names.joinToString("\n") { name ->
+                    "$name = ${uri.getQueryParameter(name).orEmpty()}"
+                }
+            }
+
+            ActionResult.Success(
+                buildString {
+                    appendLine("URL 解析结果")
+                    appendLine("scheme: $scheme")
+                    appendLine("host: $host")
+                    appendLine("path: $path")
+                    appendLine("queryCount: ${names.size}")
+                    append("query:\n$queryText")
+                }
+            )
         } catch (t: Throwable) {
             ActionResult.Error(t.message ?: "Invalid URL")
+        }
+    }
+
+    private fun openUrl(input: String): ActionResult {
+        return try {
+            val raw = input.trim()
+            if (raw.isBlank()) return ActionResult.Error("URL is empty")
+            val normalized = if (
+                raw.startsWith("http://", ignoreCase = true) ||
+                raw.startsWith("https://", ignoreCase = true)
+            ) raw else "https://$raw"
+
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(normalized)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+            ActionResult.Success("已打开浏览器")
+        } catch (t: Throwable) {
+            ActionResult.Error(t.message ?: "Failed to open URL")
         }
     }
 
@@ -112,8 +160,7 @@ class LocalClipboardActionExecutor @Inject constructor() : ClipboardActionExecut
     private fun explainCode(input: String): ActionResult {
         val text = input.trim()
         if (text.isEmpty()) return ActionResult.Error("代码内容为空")
-        val preview = if (text.length <= CODE_PREVIEW_LIMIT) text else text.take(CODE_PREVIEW_LIMIT) + "..."
-        return ActionResult.Success("本地代码说明：\n$preview")
+        return ActionResult.Success("本地代码说明：\n$text")
     }
 
     private fun analyzeCode(input: String): ActionResult {
@@ -254,7 +301,6 @@ class LocalClipboardActionExecutor @Inject constructor() : ClipboardActionExecut
         private const val ROOT_CLASS_NAME = "Generated"
         private const val JSON_INDENT_SPACES = 2
         private const val SUMMARY_LIMIT = 100
-        private const val CODE_PREVIEW_LIMIT = 220
         private val KOTLIN_KEYWORDS = setOf(
             "class", "object", "interface", "fun", "val", "var", "when", "if", "else",
             "for", "while", "do", "try", "catch", "finally", "return", "break", "continue",

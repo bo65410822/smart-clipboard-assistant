@@ -12,7 +12,7 @@ class MockExecutor @Inject constructor() : AIExecutor {
 
     override suspend fun explainCode(code: String): String {
         delay(NETWORK_MOCK_MS)
-        return "[Mock] 解释代码：\n${code.take(PREVIEW_LENGTH)}..."
+        return "[Mock] 解释代码：\n$code"
     }
 
     override suspend fun translateText(text: String): String {
@@ -22,7 +22,7 @@ class MockExecutor @Inject constructor() : AIExecutor {
 
     override suspend fun formatJson(json: String): String {
         delay(NETWORK_MOCK_MS)
-        return "[Mock] 格式化 JSON：\n${json.take(PREVIEW_LENGTH)}..."
+        return "[Mock] 格式化 JSON：\n$json"
     }
 
     override suspend fun summarizeUrl(url: String): String {
@@ -32,6 +32,5 @@ class MockExecutor @Inject constructor() : AIExecutor {
 
     private companion object {
         private const val NETWORK_MOCK_MS = 50L
-        private const val PREVIEW_LENGTH = 200
     }
 }

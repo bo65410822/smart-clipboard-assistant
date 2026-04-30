@@ -246,7 +246,7 @@ class ClipboardViewModel @Inject constructor(
     private fun getDefaultAction(contentType: ContentType): ClipboardAction? {
         return when (contentType) {
             ContentType.JSON -> ClipboardAction.ConvertToKotlinDataClass
-            ContentType.URL -> ClipboardAction.OpenUrl
+            ContentType.URL -> ClipboardAction.SummarizeUrl
             ContentType.CODE -> ClipboardAction.ExplainCode
             ContentType.TEXT -> ClipboardAction.SummarizeText
             ContentType.UNKNOWN -> null
